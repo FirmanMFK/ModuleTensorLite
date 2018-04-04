@@ -31,46 +31,26 @@ public class TfLiteClassifier {
     public static int DIM_IMG_SIZE_Y;
 
     private static String TAG;
-    /**
-     * Name of the model file stored in Assets.
-     */
+
     private static String MODEL_PATH;
 
-    /**
-     * Name of the label file stored in Assets.
-     */
     private static String LABEL_PATH = "labels.txt";
 
-    /**
-     * Number of results to show in the UI.
-     */
     private static int RESULTS_TO_SHOW;
-    /**
-     * Dimensions of inputs.
-     */
+  
     private static int DIM_BATCH_SIZE = 1;
+
     private static int DIM_PIXEL_SIZE;
-    /* Preallocated buffers for storing image data in. */
+
     private int[] intValues ;
 
-    /**
-     * An instance of the driver class to run model inference with Tensorflow Lite.
-     */
+
     private Interpreter tflite;
 
-    /**
-     * Labels corresponding to the output of the vision model.
-     */
     private List<String> labelList;
 
-    /**
-     * A ByteBuffer to hold image data, to be feed into Tensorflow Lite as inputs.
-     */
     private ByteBuffer imgData = null;
 
-    /**
-     * An array to hold inference results, to be feed into Tensorflow Lite as outputs.
-     */
     private byte[][] labelProbArray = null;
 
     private PriorityQueue<Map.Entry<String, Float>> sortedLabels;
@@ -112,9 +92,6 @@ public class TfLiteClassifier {
 
     }
 
-    /**
-     * Reads label list from Assets.
-     */
     private List<String> loadLabelList(Activity activity) throws IOException {
         List<String> labelList = new ArrayList<String>();
         BufferedReader reader =
@@ -128,9 +105,6 @@ public class TfLiteClassifier {
     }
 
 
-    /**
-     * Memory-map the model file in Assets.
-     */
     private MappedByteBuffer loadModelFile(Activity activity) throws IOException {
         AssetFileDescriptor fileDescriptor = activity.getAssets().openFd(MODEL_PATH);
         FileInputStream inputStream = new FileInputStream(fileDescriptor.getFileDescriptor());
@@ -140,16 +114,14 @@ public class TfLiteClassifier {
         return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength);
     }
 
-    /**
-     * Writes Image data into a {@code ByteBuffer}.
-     */
+
     private void convertBitmapToByteBuffer(Bitmap bitmap) {
         if (imgData == null) {
             return;
         }
         imgData.rewind();
         bitmap.getPixels(intValues, 0, bitmap.getWidth(), 0, 0, bitmap.getWidth(), bitmap.getHeight());
-        // Convert the image to floating point.
+    
         int pixel = 0;
         long startTime = SystemClock.uptimeMillis();
         for (int i = 0; i < DIM_IMG_SIZE_X; ++i) {
@@ -170,7 +142,7 @@ public class TfLiteClassifier {
             return new ArrayList<>();
         }
         convertBitmapToByteBuffer(bitmap);
-        // Here's where the magic happens!!!
+    
         long startTime = SystemClock.uptimeMillis();
         tflite.run(imgData, labelProbArray);
         long endTime = SystemClock.uptimeMillis();
